@@ -22,6 +22,9 @@
     <main>
       <router-view />
     </main>
+    
+    <!-- 플로팅 AI 챗봇 -->
+    <ChatbotPIP v-if="authStore.isAuthenticated" />
   </div>
 </template>
 
@@ -29,6 +32,7 @@
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
 import { useRouter } from 'vue-router'
+import ChatbotPIP from './components/ChatbotPIP.vue'
 
 const authStore = useAuthStore()
 const themeStore = useThemeStore()

@@ -5,11 +5,15 @@ Vue3 + Express + PostgreSQL 기반의 회의실 예약 시스템입니다.
 ## 기능
 
 - 회원가입/로그인 (JWT 인증)
-- 회의실 등록/수정/삭제
+- 회의실 등록/수정/삭제 (수용 인원 설정)
 - 30분 단위 타임슬롯 예약
 - 블록 테이블 형태의 예약 현황 조회
 - 다크모드/라이트모드 지원
 - 내 예약 조회 및 취소
+- **🤖 AI 챗봇 예약 비서** (OpenAI GPT 기반)
+  - 자연어로 회의실 검색 ("이번 주에 20명 회의실 알려줘")
+  - 대화형 예약 진행
+  - 예약 현황 조회
 
 ## 기술 스택
 
@@ -46,6 +50,7 @@ cp frontend/.env.example frontend/.env
 | `JWT_EXPIRES_IN` | JWT 만료 시간 | 7d |
 | `FRONTEND_PORT` | 프론트엔드 서버 포트 | 5173 |
 | `VITE_API_URL` | 백엔드 API URL | http://localhost:3001 |
+| `OPENAI_API_KEY` | OpenAI API 키 (챗봇 기능) | (설정 필요) |
 
 ## 빠른 시작
 
@@ -114,6 +119,11 @@ npm run dev
 - `POST /api/reservations` - 예약 생성 (인증 필요)
 - `DELETE /api/reservations/:id` - 예약 취소 (인증 필요, 본인 예약만)
 
+### AI 챗봇
+
+- `POST /api/chatbot` - 챗봇 메시지 전송 (인증 필요)
+- `GET /api/chatbot/quick-info` - 빠른 정보 조회 (인증 필요)
+
 ## 프로젝트 구조
 
 ```
@@ -164,11 +174,36 @@ docker-compose restart backend
 docker-compose down -v
 ```
 
+## AI 챗봇 설정
+
+AI 챗봇 기능을 사용하려면 OpenAI API 키가 필요합니다.
+
+1. [OpenAI Platform](https://platform.openai.com)에서 API 키 발급
+2. 백엔드 `.env` 파일에 추가:
+   ```
+   OPENAI_API_KEY=sk-your-api-key-here
+   ```
+
+### 챗봇 사용 예시
+
+- "이번 주 금요일에 20명 회의실 예약해줘"
+- "내일 오후 2시부터 4시까지 가능한 회의실 알려줘"
+- "이번 주 전체 예약 현황 보여줘"
+- "가장 큰 회의실은 어디야?"
+
+### 기존 DB에 수용 인원 컬럼 추가 (업그레이드 시)
+
+```sql
+-- backend/src/db/migrations/add_capacity.sql 실행
+ALTER TABLE rooms ADD COLUMN IF NOT EXISTS capacity INTEGER DEFAULT 10;
+```
+
 ## 보안 주의사항
 
 - `.env` 파일은 절대 git에 커밋하지 마세요
 - 프로덕션 환경에서는 강력한 `JWT_SECRET`을 사용하세요
 - 프로덕션 환경에서는 `POSTGRES_PASSWORD`를 안전하게 설정하세요
+- `OPENAI_API_KEY`는 외부에 노출되지 않도록 주의하세요
 
 ## 라이선스
 

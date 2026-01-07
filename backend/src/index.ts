@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
 import roomRoutes from './routes/rooms';
 import reservationRoutes from './routes/reservations';
+import chatbotRoutes from './routes/chatbot';
 import { pool } from './db/connection';
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/reservations', reservationRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Health check
 app.get('/api/health', async (req, res) => {

@@ -8,7 +8,7 @@ const router = Router();
 router.get('/', async (req, res: Response) => {
   try {
     const result = await pool.query(
-      'SELECT id, name, description, created_at FROM rooms ORDER BY created_at DESC'
+      'SELECT id, name, description, capacity, created_at FROM rooms ORDER BY created_at DESC'
     );
     res.json(result.rows);
   } catch (error) {
@@ -22,7 +22,7 @@ router.get('/:id', async (req, res: Response) => {
   try {
     const { id } = req.params;
     const result = await pool.query(
-      'SELECT id, name, description, created_at FROM rooms WHERE id = $1',
+      'SELECT id, name, description, capacity, created_at FROM rooms WHERE id = $1',
       [id]
     );
 
@@ -40,15 +40,15 @@ router.get('/:id', async (req, res: Response) => {
 // 회의실 등록 (인증 필요)
 router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    const { name, description } = req.body;
+    const { name, description, capacity } = req.body;
 
     if (!name || name.trim().length === 0) {
       return res.status(400).json({ error: '회의실 이름을 입력해주세요.' });
     }
 
     const result = await pool.query(
-      'INSERT INTO rooms (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at',
-      [name.trim(), description || '']
+      'INSERT INTO rooms (name, description, capacity) VALUES ($1, $2, $3) RETURNING id, name, description, capacity, created_at',
+      [name.trim(), description || '', capacity || 10]
     );
 
     res.status(201).json({
@@ -65,15 +65,15 @@ router.post('/', authMiddleware, async (req: AuthRequest, res: Response) => {
 router.put('/:id', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, capacity } = req.body;
 
     if (!name || name.trim().length === 0) {
       return res.status(400).json({ error: '회의실 이름을 입력해주세요.' });
     }
 
     const result = await pool.query(
-      'UPDATE rooms SET name = $1, description = $2 WHERE id = $3 RETURNING id, name, description, created_at',
-      [name.trim(), description || '', id]
+      'UPDATE rooms SET name = $1, description = $2, capacity = $3 WHERE id = $4 RETURNING id, name, description, capacity, created_at',
+      [name.trim(), description || '', capacity || 10, id]
     );
 
     if (result.rows.length === 0) {

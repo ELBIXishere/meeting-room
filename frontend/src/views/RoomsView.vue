@@ -35,6 +35,9 @@
               <p class="room-date">{{ formatDate(room.created_at) }} 등록</p>
             </div>
           </div>
+          <div class="room-capacity">
+            <span class="capacity-badge">👥 {{ room.capacity || 10 }}명 수용</span>
+          </div>
           <p class="room-description" v-if="room.description">{{ room.description }}</p>
           <p class="room-description room-no-desc" v-else>설명이 없습니다</p>
           <div class="room-actions">
@@ -62,6 +65,19 @@
               v-model="formData.name"
               class="form-input"
               placeholder="예: 대회의실 A"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">수용 인원 *</label>
+            <input
+              type="number"
+              v-model.number="formData.capacity"
+              class="form-input"
+              placeholder="예: 10"
+              min="1"
+              max="500"
               required
             />
           </div>
@@ -125,7 +141,8 @@ const roomToEdit = ref(null)
 
 const formData = ref({
   name: '',
-  description: ''
+  description: '',
+  capacity: 10
 })
 
 const fetchRooms = async () => {
@@ -158,7 +175,8 @@ const editRoom = (room) => {
   roomToEdit.value = room
   formData.value = {
     name: room.name,
-    description: room.description || ''
+    description: room.description || '',
+    capacity: room.capacity || 10
   }
   showEditModal.value = true
 }
@@ -202,7 +220,7 @@ const closeModal = () => {
   showAddModal.value = false
   showEditModal.value = false
   roomToEdit.value = null
-  formData.value = { name: '', description: '' }
+  formData.value = { name: '', description: '', capacity: 10 }
   error.value = ''
 }
 
@@ -285,6 +303,20 @@ onMounted(fetchRooms)
 .room-no-desc {
   color: var(--text-muted);
   font-style: italic;
+}
+
+.room-capacity {
+  margin-bottom: 0.75rem;
+}
+
+.capacity-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .room-actions {
